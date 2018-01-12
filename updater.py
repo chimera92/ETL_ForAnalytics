@@ -187,16 +187,16 @@ def loadEXP(EntityDB, row):
     addresses = []
     if row.get('addresses'):
         addresses = row.get('addresses').split(";")
-        row['all_addresses']=row.pop('addresses')
-
+        row['all_addresses'] = row.pop('addresses')
 
     index = 0
     if (len(addresses) == 0):
         Country = "Not identified"
         row["address"] = ""
         id = u''.join(filter(None, (
-        "EXP_", row.get("name"), row.get('source_information_url'), str(row.get('entity_number')), row.get('address'),
-        row.get('federal_register_notice'))))
+            "EXP_", row.get("name"), row.get('source_information_url'), str(row.get('entity_number')),
+            row.get('address'),
+            row.get('federal_register_notice'))))
         load_content(EntityDB, Country, id, row)
         return
 
@@ -204,8 +204,9 @@ def loadEXP(EntityDB, row):
         address = addresses[index]
         row["address"] = address
         id = u''.join(filter(None, (
-        "EXP_", row.get("name"), row.get('source_information_url'), str(row.get('entity_number')), row.get('address'),
-        row.get('federal_register_notice'))))
+            "EXP_", row.get("name"), row.get('source_information_url'), str(row.get('entity_number')),
+            row.get('address'),
+            row.get('federal_register_notice'))))
 
         countryCode = get_normalized_country_name(address)
 
