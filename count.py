@@ -1,5 +1,4 @@
 import pymongo
-client = pymongo.MongoClient('18.218.79.6', 27017)
 client = pymongo.MongoClient('localhost', 27017)
 database = client["EntityDB"]
 count=0
