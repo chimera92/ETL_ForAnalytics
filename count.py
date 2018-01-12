@@ -1,5 +1,4 @@
 import pymongo
-client = pymongo.MongoClient('18.218.79.6', 27017)
 client = pymongo.MongoClient('localhost', 27017)
 database = client["EntityDB"]
 count=0
@@ -20,13 +19,3 @@ for coll in collections:
 print "\n\nTotal Offshore Leaks count:{}".format(OFL_count)
 print "Total US Consolidated Screening List count:{}".format(EXP_count)
 print "Total count:{}".format(OFL_count+EXP_count)
-# Created with Studio 3T, the IDE for MongoDB - https://studio3t.com/
-
-# query = {}
-#
-# cursor = collection.find(query)
-# try:
-#     for doc in cursor:
-#         print doc["_id"]
-# finally:
-#     cursor.close()
