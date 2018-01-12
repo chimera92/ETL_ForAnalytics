@@ -30,7 +30,7 @@ logger.addHandler(file_log_handler)
 geolocator = GoogleV3(api_key='xxx')
 ex = ThreadPoolExecutor(max_workers=200)
 
-DB_IP = "xxx"
+DB_IP = "localhost"
 PORT = 27017
 logger.info('Connecting to database at "{}" port "{}"'.format(DB_IP, PORT))
 mongoClient = pymongo.MongoClient(DB_IP, PORT)
@@ -94,10 +94,10 @@ def get_normalized_country_name(countryAddress):
                 countryMap = {'_id': countryAddress, 'normal_value': countryCode, 'long_name': longName}
                 normalizedCountryNamesCollection.insert(countryMap)
                 return countryCode
-            else:
-                countryMap = {'_id': countryAddress, 'normal_value': 'Not identified', 'long_name': 'Not identified'}
-                normalizedCountryNamesCollection.insert(countryMap)
-                return "Not identified"
+
+        countryMap = {'_id': countryAddress, 'normal_value': 'Not identified', 'long_name': 'Not identified'}
+        normalizedCountryNamesCollection.insert(countryMap)
+        return "Not identified"
     else:
         countryMap = {'_id': countryAddress, 'normal_value': 'Not identified', 'long_name': 'Not identified'}
         normalizedCountryNamesCollection.insert(countryMap)
@@ -133,13 +133,13 @@ def loadOFL(EntityDB, row):
     if row.get('countries'):
         countries = row.get('countries').split(";")
 
-    addressess = []
+    addresses = []
     all_address = ""
     if row.get('address'):
         all_address = row.get('address')
-        addressess = row.get('address').split(";")
+        addresses = row.get('address').split(";")
 
-    row['addresses'] = all_address
+    row['all_addresses'] = all_address
 
     index = 0
     if (len(countries) == 0):
@@ -149,12 +149,12 @@ def loadOFL(EntityDB, row):
 
     while (index < len(countries)):
         country = countries[index]
-        if len(countries) != len(addressess):
+        if len(countries) != len(addresses):
             address = row.get('address')
             if not address:
                 address = ""
         else:
-            address = addressess[index]
+            address = addresses[index]
         row['address'] = address
 
         if address:
@@ -184,12 +184,14 @@ def processOffshoreLeaks(offshoreLeaksFilePointer):
 
 
 def loadEXP(EntityDB, row):
-    addressess = []
+    addresses = []
     if row.get('addresses'):
-        addressess = row.get('addresses').split(";")
+        addresses = row.get('addresses').split(";")
+        row['all_addresses']=row.pop('addresses')
+
 
     index = 0
-    if (len(addressess) == 0):
+    if (len(addresses) == 0):
         Country = "Not identified"
         row["address"] = ""
         id = u''.join(filter(None, (
@@ -198,8 +200,8 @@ def loadEXP(EntityDB, row):
         load_content(EntityDB, Country, id, row)
         return
 
-    while (index < len(addressess)):
-        address = addressess[index]
+    while (index < len(addresses)):
+        address = addresses[index]
         row["address"] = address
         id = u''.join(filter(None, (
         "EXP_", row.get("name"), row.get('source_information_url'), str(row.get('entity_number')), row.get('address'),
@@ -232,7 +234,7 @@ def processEXP_GOV_ConsolidatedScrnList(EXP_GOV_ConsolidatedScrnList):
 
 
 try:
-    with eventlet.Timeout(10):
+    with eventlet.Timeout(30):
         logger.info('Processing OFFSHORE LEAKS')
         IPLINK = "https://offshoreleaks-data.icij.org/offshoreleaks/csv/csv_offshore_leaks.2017-12-19.zip#_ga=2.164222911.1415007272.1515343932-1495118144.1515130262"
         logger.info('Downloading {}'.format(IPLINK))
@@ -248,7 +250,7 @@ except Exception as e:
     logger.info(e)
 
 try:
-    with eventlet.Timeout(10):
+    with eventlet.Timeout(30):
         logger.info('Processing US Consolidated Screening List')
         IPLINK = "https://api.trade.gov/consolidated_screening_list/search.csv?api_key=OHZYuksFHSFao8jDXTkfiypO"
         logger.info('Downloading {}'.format(IPLINK))
